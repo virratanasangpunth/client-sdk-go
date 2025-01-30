@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/HdrHistogram/hdrhistogram-go"
-	"github.com/google/uuid"
 	"github.com/loov/hrtime"
 	"github.com/momentohq/client-sdk-go/auth"
 	"github.com/momentohq/client-sdk-go/config"
@@ -304,8 +303,8 @@ func timer(
 	publishErrChan chan string,
 	statsInterval time.Duration,
 ) {
-	subscribeHistogram := hdrhistogram.New(1, 5000, 1)
-	publishHistogram := hdrhistogram.New(1, 5000, 1)
+	subscribeHistogram := hdrhistogram.New(1, 500000, 1)
+	publishHistogram := hdrhistogram.New(1, 500000, 1)
 	subscribeErrorCounter := ErrorCounter{}
 	publishErrorCounter := ErrorCounter{}
 
@@ -395,24 +394,27 @@ func (r *loadGenerator) run(ctx context.Context, client momento.TopicClient) {
 func main() {
 	ctx := context.Background()
 
-	cacheName := fmt.Sprintf("go-topic-loadgen-%s", uuid.NewString())
+	cacheName := "go-topic-loadgen"
 
 	opts := topicsLoadGeneratorOptions{
 		cacheName:         cacheName,
 		logLevel:          momento_default_logger.DEBUG,
 		showStatsInterval: time.Second * 5,
 		// must be at least 13 to accommodate an epoch timestamp value to calculate latency
-		messageBytes:   1,
-		numberOfUsers:  10,
-		numberOfTopics: 5,
+		messageBytes:   13,
+		numberOfUsers:  1500,
+		numberOfTopics: 1,
 		// maxPublishTps is per-user
 		maxPublishTps: 1,
-		howLongToRun:  time.Second * 60,
+		howLongToRun:  time.Second * 14400,
 	}
+
+	// logLevel := momento_default_logger.INFO
+	// loggerFactory := momento_default_logger.NewDefaultMomentoLoggerFactory(logLevel)
 
 	lgCfg := config.TopicsDefaultWithLogger(
 		logger.NewNoopMomentoLoggerFactory(),
-	).WithMaxSubscriptions(uint32(opts.numberOfUsers))
+	).WithNumGrpcChannels(16)
 
 	loadGenerator := newLoadGenerator(lgCfg, opts)
 	client, cacheClient := loadGenerator.init(ctx)

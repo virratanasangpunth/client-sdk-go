@@ -319,8 +319,8 @@ func main() {
 		// Note: You are likely to see degraded performance if you increase this above 50
 		// and observe elevated client-side latencies.
 		numberOfConcurrentRequests: 50,
-		maxRequestsPerSecond:       100,
-		howLongToRun:               time.Minute,
+		maxRequestsPerSecond:       1500,
+		howLongToRun:               time.Minute * 120,
 	}
 
 	momentoConfig := config.LaptopLatestWithLogger(momento_default_logger.NewDefaultMomentoLoggerFactory(opts.logLevel))

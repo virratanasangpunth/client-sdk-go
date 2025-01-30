@@ -14,6 +14,8 @@ require (
 	github.com/sirupsen/logrus v1.9.0
 )
 
+replace github.com/momentohq/client-sdk-go => ../
+
 require (
 	github.com/golang-jwt/jwt/v4 v4.3.0 // indirect
 	github.com/stretchr/testify v1.9.0 // indirect

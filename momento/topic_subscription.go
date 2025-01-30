@@ -143,6 +143,7 @@ func (s *topicSubscription) Event(ctx context.Context) (TopicEvent, error) {
 
 			switch subscriptionItem := typedMsg.Item.Value.Kind.(type) {
 			case *pb.XTopicValue_Text:
+				s.log.Trace("received text item %s", subscriptionItem.Text)
 				return NewTopicItem(String(subscriptionItem.Text), String(publisherId), s.lastKnownSequenceNumber, s.lastKnownSequencePage), nil
 			case *pb.XTopicValue_Binary:
 				return NewTopicItem(Bytes(subscriptionItem.Binary), String(publisherId), s.lastKnownSequenceNumber, s.lastKnownSequencePage), nil
